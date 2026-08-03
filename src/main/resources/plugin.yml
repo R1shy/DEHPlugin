@@ -1,5 +1,5 @@
 name: DEHPlugin
-version: 0.1.3
+version: 0.1.4
 main: net.rishy.dehplugin.DEHPlugin
 description: A plugin for the SOC production of Dear Evan Hansen
 author: R1shy

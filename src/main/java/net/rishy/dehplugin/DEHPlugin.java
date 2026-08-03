@@ -2,6 +2,7 @@ package net.rishy.dehplugin;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import net.rishy.dehplugin.commands.DumpPerms;
 import net.rishy.dehplugin.commands.ZeroCommand;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -24,8 +25,9 @@ public class DEHPlugin extends JavaPlugin {
             return;
         }
         sendToDiscord("Server is going up");
-        getServer().getPluginManager().registerEvents(new DEHListener(this.getConfig()), this);
+        getServer().getPluginManager().registerEvents(new DEHListener(this.getConfig(), this), this);
         registerCommand("dehzeromodel", new ZeroCommand());
+        registerCommand("dehdumpperms", new DumpPerms());
         this.getLogger().info("[Meow Meow]");
         this.getLogger().info("DEHPlugin v" + getPluginMeta().getVersion() + " says TRANS RIGHTS");
         this.getLogger().info("[Meow Meow]");
