@@ -16,8 +16,7 @@ dependencies {
     implementation("net.dv8tion:JDA:6.5.0") {
         isTransitive = true
     }
-    //compileOnly("com.github.PZDonny.DisplayEntityUtils:api:3.7.0")
-    compileOnly(files("libs/displayentityutils-3.7.0.jar"))
+    compileOnly("com.github.PZDonny.DisplayEntityUtils:api:3.7.0")
     compileOnly("io.papermc.paper:paper-api:26.2.build.+")
 }
 

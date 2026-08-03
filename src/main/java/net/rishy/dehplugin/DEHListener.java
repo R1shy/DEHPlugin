@@ -46,14 +46,12 @@ public class DEHListener implements Listener {
         if (event.getMaterial() == Material.CROSSBOW) {
             assert event.getItem() != null;
             if (event.getItem().getItemMeta() instanceof CrossbowMeta) {
-                if (((CrossbowMeta) event.getItem().getItemMeta()).hasChargedProjectiles()) event.setCancelled(true);
+                if (((CrossbowMeta) event.getItem().getItemMeta()).hasChargedProjectiles()) {
+                    event.getPlayer().sendMessage(Component.text("ERR: You can't interact with blocks while holding a loaded crossbow").color(NamedTextColor.RED));
+                    event.setCancelled(true);
+                }
             }
         }
-    }
-
-    // works in theory not practice
-    @EventHandler public void onShoot(EntityShootBowEvent event) {
-        event.setCancelled(true);
     }
 
     @EventHandler
