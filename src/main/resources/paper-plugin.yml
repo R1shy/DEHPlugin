@@ -1,7 +1,6 @@
 name: DEHPlugin
 version: 0.1.5
 main: net.rishy.dehplugin.DEHPlugin
-bootstrapper: net.rishy.dehplugin.DEHBootstrapper
 description: A plugin for the SOC production of Dear Evan Hansen
 author: R1shy
 website: https://papermc.io
