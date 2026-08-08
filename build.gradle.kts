@@ -13,9 +13,6 @@ repositories {
 }
 
 dependencies {
-    implementation("net.dv8tion:JDA:6.5.0") {
-        isTransitive = true
-    }
     compileOnly("com.github.PZDonny.DisplayEntityUtils:api:3.7.0")
     compileOnly("io.papermc.paper:paper-api:26.2.build.+")
     compileOnly("org.apache.logging.log4j:log4j-core:2.17.1")
@@ -29,7 +26,6 @@ java {
 }
 
 tasks.shadowJar {
-    relocate("net.dv8tion.jda", "net.rishy.dehplugin.libs.jda")
     mergeServiceFiles()
     archiveClassifier.set("")
 }

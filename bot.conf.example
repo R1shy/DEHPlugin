@@ -1,0 +1,39 @@
+# Minecraft server bot config — replaces mc-agent.py and the plugin's Discord code.
+# key = value, one per line. '#' and ';' start comments.
+
+# Discord bot token (same key the plugin used)
+token = TODO
+# Guild the bot lives in (exact name)
+bot_server = TODO
+# Channel for control replies and start/stop announcements
+bot_channel = TODO
+# Channel for the continuous log stream
+log_channel = TODO
+# Discord user IDs allowed to control everything (power + file writes), comma-separated
+admins =
+# Discord user IDs allowed read-only commands (status/logs/file read/download/backup list)
+readers =
+
+# How the server is started: auto | systemd | docker | screen | managed
+mode = docker
+service_name = minecraft        ; systemd unit   (mode=systemd)
+container    = minecraft        ; container name (mode=docker)
+screen_name  = minecraft        ; screen session (mode=screen)
+start_command = java -Xmx4G -jar server.jar nogui   ; (mode=managed)
+
+# Where the server lives; also where logs/latest.log is tailed from
+server_dir = /home/minecraft/server
+
+# Backups are created here and stay on the host (never uploaded to Discord)
+backup_dir  = /home/minecraft/backups
+backup_keep = 7
+
+# Largest single file upload/download accepted (MB); downloads over 25 MB are refused
+max_upload_mb = 512
+
+# Optional tunnel discovery for /status (ngrok local API)
+tunnel_api   = http://127.0.0.1:4040/api/tunnels
+server_port  = 25565
+rcon_port    = 25575
+public_mc    =
+public_rcon  =

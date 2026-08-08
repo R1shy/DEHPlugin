@@ -6,3 +6,6 @@ build
 
 # Ignore Kotlin plugin data
 .kotlin
+
+# Local bot config (holds the Discord token)
+bot.conf
