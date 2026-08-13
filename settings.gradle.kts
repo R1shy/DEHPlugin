@@ -5,3 +5,4 @@ plugins {
 rootProject.name = "DEHPlugin"
 include("src")
 include("bot")
+include("testEnv")
