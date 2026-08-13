@@ -9,3 +9,4 @@ build
 
 # Local bot config (holds the Discord token)
 bot.conf
+testEnv/*
