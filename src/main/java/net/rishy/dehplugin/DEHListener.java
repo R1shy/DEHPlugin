@@ -1,12 +1,16 @@
 package net.rishy.dehplugin;
 
 import io.papermc.paper.event.player.AsyncChatEvent;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -25,18 +29,16 @@ import java.util.List;
 
 public class DEHListener implements Listener {
 
-    private final JavaPlugin plugin;
     private static final Logger log = LoggerFactory.getLogger(DEHListener.class);
+    private final DEHSetHandler setHandler = new DEHSetHandler(new Location(Bukkit.getWorld("world"),77,-59,40), 3);
     private final List<String> crewMembers;
     private final List<String> directors;
     private final String developer;
-
     private final Component devPrefix = Component.text("[DEV] ").color(NamedTextColor.RED);
     private final Component dirPrefix = Component.text("[DIRECTOR] ").color(NamedTextColor.GOLD);
     private final Component crewPrefix = Component.text("[CREW] ").color(NamedTextColor.DARK_GREEN);
 
-    public DEHListener(FileConfiguration conf, JavaPlugin plugin) {
-        this.plugin = plugin;
+    public DEHListener(FileConfiguration conf) {
         this.crewMembers = conf.getStringList("crew");
         this.directors = conf.getStringList("directors");
         this.developer = conf.getString("dev");
@@ -55,43 +57,43 @@ public class DEHListener implements Listener {
                 }
             }
         }
-
-        if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
-
-        Block block = event.getClickedBlock();
-        if (block == null) return;
-
-        if (block.getType() != Material.OAK_DOOR) return;
-
+        Block hitBlock = event.getClickedBlock();
         Player player = event.getPlayer();
-        String playerName = player.getName();
-
-        boolean isTechCrew = crewMembers.contains(playerName)
-                || playerName.equalsIgnoreCase(developer);
-
-
-        if (!isTechCrew) {
-            event.setUseInteractedBlock(org.bukkit.event.Event.Result.DENY);
-            event.setCancelled(true);
-
-            player.sendMessage("§cYou do not have permission to open this!");
-
-            Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                if (block.getType() != Material.AIR) {
-                    player.sendBlockChange(block.getLocation(), block.getBlockData());
-
-                    Block topHalf = block.getRelative(0, 1, 0);
-                    Block bottomHalf = block.getRelative(0, -1, 0);
-
-                    if (topHalf.getType() == Material.OAK_DOOR) {
-                        player.sendBlockChange(topHalf.getLocation(), topHalf.getBlockData());
-                    }
-                    if (bottomHalf.getType() == Material.OAK_DOOR) {
-                        player.sendBlockChange(bottomHalf.getLocation(), bottomHalf.getBlockData());
-                    }
-                }
-            }, 1L);
+        Location reverseNoteBlockPos = new Location(Bukkit.getWorld("world"),7,-60,45);
+        Location forwardNoteBlock = new Location(Bukkit.getWorld("world"), 7, -60, 47);
+        assert hitBlock != null;
+        if (hitBlock.getType() == Material.NOTE_BLOCK) {
+            Sound no = Sound.sound(Key.key("entity.villager.no"), Sound.Source.PLAYER, 1f,1f);
+            if (hitBlock.getLocation().equals(reverseNoteBlockPos)) {
+            if (setHandler.getCurrentSetNumber() == 1) {
+                player.sendActionBar(Component.text("Already at first set"));
+                player.playSound(no, 7,-60,45);
+            }
+            else {
+                CMDUtils.cloneCMD(setHandler.getPrevSetStartPos(), setHandler.getPrevSetEndPos(), setHandler.STAGE_START_POS);
+                setHandler.decrCurrentSetNumber();
+                player.sendMessage(Component.text(setHandler.getCurrentSetNumber()));
+            }
         }
+        if (hitBlock.getLocation().equals(forwardNoteBlock)) {
+            if (setHandler.getCurrentSetNumber() == 3) {
+                player.sendActionBar(Component.text("At last set"));
+                player.playSound(no, 7, -60,47);
+            }
+            else {
+                CMDUtils.cloneCMD(setHandler.getNextSetStartPos(), setHandler.getNextSetEndPos(), setHandler.STAGE_START_POS);
+                setHandler.incrCurrentSetNumber();
+            }
+
+        }
+
+
+        }
+
+
+
+
+
     }
 
     @EventHandler

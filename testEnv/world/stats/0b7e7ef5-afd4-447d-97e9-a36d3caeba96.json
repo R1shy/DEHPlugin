@@ -1,0 +1,35 @@
+{
+  "stats": {
+    "minecraft:picked_up": {
+      "minecraft:feather": 4,
+      "minecraft:chicken": 2
+    },
+    "minecraft:custom": {
+      "minecraft:time_since_rest": 112421,
+      "minecraft:walk_one_cm": 138583,
+      "minecraft:leave_game": 21,
+      "minecraft:play_time": 113025,
+      "minecraft:jump": 198,
+      "minecraft:time_since_death": 112390,
+      "minecraft:sprint_one_cm": 4950,
+      "minecraft:tune_noteblock": 254,
+      "minecraft:total_world_time": 113025,
+      "minecraft:fly_one_cm": 321275,
+      "minecraft:crouch_one_cm": 255,
+      "minecraft:sneak_time": 513,
+      "minecraft:deaths": 1
+    },
+    "minecraft:used": {
+      "minecraft:black_concrete": 17,
+      "minecraft:grass_block": 22,
+      "minecraft:white_concrete": 58,
+      "minecraft:oak_sign": 7,
+      "minecraft:note_block": 3,
+      "minecraft:green_carpet": 2,
+      "minecraft:red_carpet": 1,
+      "minecraft:red_concrete": 14,
+      "minecraft:dirt": 3
+    }
+  },
+  "DataVersion": 4671
+}
