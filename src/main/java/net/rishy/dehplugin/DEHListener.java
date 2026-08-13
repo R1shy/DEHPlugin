@@ -1,8 +1,6 @@
 package net.rishy.dehplugin;
 
 import io.papermc.paper.event.player.AsyncChatEvent;
-import net.kyori.adventure.key.Key;
-import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -32,7 +30,11 @@ import java.util.List;
 
 public class DEHListener implements Listener {
 
-    private final DEHSetHandler setHandler = new DEHSetHandler(new Location(Bukkit.getWorld("world"),77,-59,40), 3);
+    private final DEHSetHandler setHandler = new DEHSetHandler(List.of(
+            new Location(Bukkit.getWorld("world"), 77, -59, 40),
+            new Location(Bukkit.getWorld("world"), 80, -59, 43),
+            new Location(Bukkit.getWorld("world"), 83, -59, 46),
+            new Location(Bukkit.getWorld("world"), 86, -59, 40)), 3, List.of(5, 4, 1, 2));
     private final Block infoSign = new Location(Bukkit.getWorld("world"), 7,-60,46).getBlock();
     private final List<String> crewMembers;
     private final List<String> directors;
@@ -64,60 +66,39 @@ public class DEHListener implements Listener {
         Player player = event.getPlayer();
         Location reverseNoteBlockPos = new Location(Bukkit.getWorld("world"),7,-60,45);
         Location forwardNoteBlock = new Location(Bukkit.getWorld("world"), 7, -60, 47);
-        assert hitBlock != null;
+        if (hitBlock == null)
+            return;
         if (hitBlock.getType() == Material.NOTE_BLOCK) {
-            Sound no = Sound.sound(Key.key("entity.villager.no"), Sound.Source.PLAYER, 1f,1f);
             if (hitBlock.getLocation().equals(reverseNoteBlockPos)) {
-            if (setHandler.getCurrentSetNumber() == 1) {
-                player.sendActionBar(Component.text("Already at first set"));
-                player.playSound(no, 7,-60,45);
+                setHandler.reverse();
+                loadCurrentSet(player);
             }
-            else {
-                CMDUtils.cloneCMD(setHandler.getPrevSetStartPos(), setHandler.getPrevSetEndPos(), setHandler.STAGE_START_POS);
-                setHandler.decrCurrentSetNumber();
-                player.sendMessage(Component.text(setHandler.getCurrentSetNumber()));
-
-                if (infoSign.getState() instanceof Sign s) {
-                    SignSide front = s.getSide(Side.FRONT);
-                    front.setGlowingText(true);
-                    front.line(1, Component.text("CURRENT SET:"));
-                    front.line(2, Component.text(setHandler.getCurrentSetNumber()));
-                    s.update(true);
-                }
-                else {
-                    player.sendMessage(Component.text("NOT SIGN"));
-                }
+            else if (hitBlock.getLocation().equals(forwardNoteBlock)) {
+                setHandler.advance();
+                loadCurrentSet(player);
             }
         }
-        if (hitBlock.getLocation().equals(forwardNoteBlock)) {
-            if (setHandler.getCurrentSetNumber() == 3) {
-                player.sendActionBar(Component.text("At last set"));
-                player.playSound(no, 7, -60,47);
-            }
-            else {
-                CMDUtils.cloneCMD(setHandler.getNextSetStartPos(), setHandler.getNextSetEndPos(), setHandler.STAGE_START_POS);
-                setHandler.incrCurrentSetNumber();
-                if (infoSign.getState() instanceof Sign s) {
-                    SignSide front = s.getSide(Side.FRONT);
-                    front.setGlowingText(true);
-                    front.line(1, Component.text("CURRENT SET:"));
-                    front.line(2, Component.text(setHandler.getCurrentSetNumber()));
-                    s.update(true);
-                }
-                else {
-                    player.sendMessage(Component.text("NOT SIGN"));
-                }
-            }
 
+
+
+
+
+    }
+
+    private void loadCurrentSet(Player player) {
+        CMDUtils.cloneCMD(setHandler.getCurrentSetStartPos(), setHandler.getCurrentSetEndPos(), setHandler.STAGE_START_POS);
+        if (infoSign.getState() instanceof Sign s) {
+            SignSide front = s.getSide(Side.FRONT);
+            front.setGlowingText(true);
+            front.line(1, Component.text("CURRENT SET:"));
+            front.line(2, Component.text(setHandler.getGlobalSetNumber()));
+            front.line(3, Component.text("SCENE " + setHandler.getSceneNumber()));
+            s.update(true);
         }
-
-
+        else {
+            player.sendMessage(Component.text("NOT SIGN"));
         }
-
-
-
-
-
+        player.sendMessage(Component.text("Scene " + setHandler.getSceneNumber() + " | Set " + setHandler.getGlobalSetNumber()));
     }
 
     @EventHandler
