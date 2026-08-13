@@ -12,6 +12,9 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.Sign;
+import org.bukkit.block.sign.Side;
+import org.bukkit.block.sign.SignSide;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -29,8 +32,8 @@ import java.util.List;
 
 public class DEHListener implements Listener {
 
-    private static final Logger log = LoggerFactory.getLogger(DEHListener.class);
     private final DEHSetHandler setHandler = new DEHSetHandler(new Location(Bukkit.getWorld("world"),77,-59,40), 3);
+    private final Block infoSign = new Location(Bukkit.getWorld("world"), 7,-60,46).getBlock();
     private final List<String> crewMembers;
     private final List<String> directors;
     private final String developer;
@@ -73,6 +76,17 @@ public class DEHListener implements Listener {
                 CMDUtils.cloneCMD(setHandler.getPrevSetStartPos(), setHandler.getPrevSetEndPos(), setHandler.STAGE_START_POS);
                 setHandler.decrCurrentSetNumber();
                 player.sendMessage(Component.text(setHandler.getCurrentSetNumber()));
+
+                if (infoSign.getState() instanceof Sign s) {
+                    SignSide front = s.getSide(Side.FRONT);
+                    front.setGlowingText(true);
+                    front.line(1, Component.text("CURRENT SET:"));
+                    front.line(2, Component.text(setHandler.getCurrentSetNumber()));
+                    s.update(true);
+                }
+                else {
+                    player.sendMessage(Component.text("NOT SIGN"));
+                }
             }
         }
         if (hitBlock.getLocation().equals(forwardNoteBlock)) {
@@ -83,6 +97,16 @@ public class DEHListener implements Listener {
             else {
                 CMDUtils.cloneCMD(setHandler.getNextSetStartPos(), setHandler.getNextSetEndPos(), setHandler.STAGE_START_POS);
                 setHandler.incrCurrentSetNumber();
+                if (infoSign.getState() instanceof Sign s) {
+                    SignSide front = s.getSide(Side.FRONT);
+                    front.setGlowingText(true);
+                    front.line(1, Component.text("CURRENT SET:"));
+                    front.line(2, Component.text(setHandler.getCurrentSetNumber()));
+                    s.update(true);
+                }
+                else {
+                    player.sendMessage(Component.text("NOT SIGN"));
+                }
             }
 
         }
