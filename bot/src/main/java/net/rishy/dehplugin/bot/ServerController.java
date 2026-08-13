@@ -60,10 +60,19 @@ public final class ServerController {
     }
 
     static CommandResult run(List<String> args, long timeoutSeconds) {
+        return run(args, timeoutSeconds, null);
+    }
+
+    static CommandResult run(List<String> args, long timeoutSeconds, String input) {
         try {
             ProcessBuilder builder = new ProcessBuilder(args);
             builder.redirectErrorStream(true);
             Process process = builder.start();
+            if (input != null) {
+                process.getOutputStream().write(input.getBytes(StandardCharsets.UTF_8));
+                process.getOutputStream().flush();
+                process.getOutputStream().close();
+            }
             String output = new String(process.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
             if (!process.waitFor(timeoutSeconds, TimeUnit.SECONDS)) {
                 process.destroyForcibly();
@@ -217,6 +226,65 @@ public final class ServerController {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
+    }
+
+    public Result sendConsole(String command) {
+        String rconPassword = propertiesValue("enable-rcon", "false").equalsIgnoreCase("true")
+                ? propertiesValue("rcon.password", "") : "";
+        if (!rconPassword.isEmpty()) {
+            int port = Integer.parseInt(propertiesValue("rcon.port", "25575"));
+            RconClient.RconResult r = RconClient.command("127.0.0.1", port, rconPassword, command);
+            return new Result(r.ok(), r.ok() && !r.output().isBlank() ? r.output() : "sent");
+        }
+        switch (mode) {
+            case "managed" -> {
+                synchronized (lock) {
+                    if (managed == null || !managed.isAlive()) {
+                        return Result.err("server is not running");
+                    }
+                    OutputStream stdin = managed.getOutputStream();
+                    try {
+                        stdin.write((command + "\n").getBytes(StandardCharsets.UTF_8));
+                        stdin.flush();
+                        return Result.ok("sent");
+                    } catch (IOException e) {
+                        return Result.err(e.getMessage());
+                    }
+                }
+            }
+            case "screen" -> {
+                CommandResult r = run(List.of("screen", "-S", config.get("screen_name", "minecraft"),
+                        "-X", "stuff", command + "\n"), 20);
+                return new Result(r.code() == 0, r.output().isEmpty() ? "sent" : r.output());
+            }
+            case "docker" -> {
+                CommandResult r = run(List.of("docker", "exec", "-i", config.get("container", "minecraft"),
+                        "sh", "-c", "cat > /proc/1/fd/0"), 20, command + "\n");
+                return new Result(r.code() == 0, r.output().isEmpty() ? "sent" : r.output());
+            }
+            default -> {
+                return Result.err("console access not supported for " + mode
+                        + " mode; enable RCON (enable-rcon=true) in server.properties");
+            }
+        }
+    }
+
+    private String propertiesValue(String key, String def) {
+        Path properties = serverDir.resolve("server.properties");
+        try {
+            for (String raw : Files.readAllLines(properties)) {
+                String line = raw.strip();
+                if (line.isEmpty() || line.startsWith("#") || !line.contains("=")) {
+                    continue;
+                }
+                int eq = line.indexOf('=');
+                if (line.substring(0, eq).strip().equals(key)) {
+                    return line.substring(eq + 1).strip();
+                }
+            }
+        } catch (IOException ignored) {
+        }
+        return def;
     }
 
     public Map<String, Object> state() {

@@ -9,6 +9,8 @@ bot_server = TODO
 bot_channel = TODO
 # Channel for the continuous log stream
 log_channel = TODO
+# Channel whose messages are forwarded into the game chat (with the Discord username)
+chat_channel = TODO
 # Discord user IDs allowed to control everything (power + file writes), comma-separated
 admins =
 # Discord user IDs allowed read-only commands (status/logs/file read/download/backup list)

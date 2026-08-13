@@ -42,7 +42,10 @@ public final class LogForwarder implements Runnable {
                     if (isSkippable(line)) {
                         continue;
                     }
-                    pending.add(line);
+                    String formatted = LogFormatter.format(line);
+                    if (formatted != null) {
+                        pending.add(formatted);
+                    }
                 }
                 if (!pending.isEmpty() && now - lastFlush >= FLUSH_MS) {
                     lastFlush = now;
