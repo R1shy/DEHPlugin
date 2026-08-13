@@ -7,7 +7,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Follows logs/latest.log, surviving rotation and truncation. */
 public final class LogTail {
 
     private final Path path;

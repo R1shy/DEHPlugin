@@ -39,6 +39,7 @@ public final class BotMain {
 
         DiscordCommands commands = new DiscordCommands(config, controller);
         jda.addEventListener(commands);
+        jda.addEventListener(new GameChatBridge(config, controller));
 
         LogForwarder forwarder = new LogForwarder(jda, config, controller);
         StateWatcher watcher = new StateWatcher(jda, config, controller);
