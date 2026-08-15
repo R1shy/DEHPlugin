@@ -8,11 +8,13 @@ controls:
   forward-note-block-pos: [7, -60, 47]
 
 sets:
-  stage-start-pos: [9, -59, 45]
-  first-set-pos: [77, -59, 40]
-  set-distance: 1
-  scene-spacing: 1
+  stage-start-pos: [-79,117,-75]
+  first-set-pos: [31, -62, -49]
+  set-distance: 43
+  scene-spacing: 20
   set-width: 41
+  set-length: 18
+  set-height: 16
   sets-per-scene: [3, 3, 3]
-  set-direction: "-x"
-  scene-direction: "-z"
+  set-direction: "-z"
+  scene-direction: "-x"

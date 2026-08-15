@@ -53,6 +53,8 @@ public class DEHListener implements Listener {
                 conf.getInt("sets.set-distance"),
                 conf.getInt("sets.scene-spacing"),
                 conf.getInt("sets.set-width"),
+                conf.getInt("sets.set-length"),
+                conf.getInt("sets.set-height"),
                 conf.getString("sets.set-direction"),
                 conf.getString("sets.scene-direction"),
                 conf.getIntegerList("sets.sets-per-scene"),

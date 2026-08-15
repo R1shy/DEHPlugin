@@ -6,15 +6,22 @@ public class Scene {
     private final Location firstSetLoc;
     private final int setDistance;
     private final int setWidth;
+    private final int setLength;
+    private final int setHeight;
     private final int numSets;
     private final String setDirection;
+    private final String sceneDirection;
 
-    public Scene(Location firstSetLoc, int setDistance, int setWidth, int numSets, String setDirection) {
+    public Scene(Location firstSetLoc, int setDistance, int setWidth, int setLength, int setHeight,
+                 int numSets, String setDirection, String sceneDirection) {
         this.firstSetLoc = firstSetLoc;
         this.setDistance = setDistance;
         this.setWidth = setWidth;
+        this.setLength = setLength;
+        this.setHeight = setHeight;
         this.numSets = numSets;
         this.setDirection = setDirection;
+        this.sceneDirection = sceneDirection;
     }
 
     public int getNumSets() {
@@ -27,7 +34,10 @@ public class Scene {
 
     public Location getSetEndPos(int setNum) {
         Location start = getSetStartPos(setNum);
-        return start.add(setWidth - 1, setWidth - 1, setWidth - 1);
+        Location end = move(start, setLength - 1, sceneDirection);
+        end = move(end, setHeight - 1, "y");
+        end = move(end, setWidth - 1, setDirection);
+        return end;
     }
 
     static Location move(Location loc, int distance, String direction) {

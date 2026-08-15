@@ -8,6 +8,8 @@ public class DEHSetHandler {
     private final int setDistance;
     private final int sceneSpacing;
     private final int setWidth;
+    private final int setLength;
+    private final int setHeight;
     private final String setDirection;
     private final String sceneDirection;
     private final List<Integer> setsPerScene;
@@ -18,13 +20,15 @@ public class DEHSetHandler {
     private int localSetNumber = 1;
     private int globalSetNumber = 1;
 
-    public DEHSetHandler(Location firstSetPos, int setDistance, int sceneSpacing, int setWidth,
-                         String setDirection, String sceneDirection, List<Integer> setsPerScene,
+    public DEHSetHandler(Location firstSetPos, int setDistance, int sceneSpacing, int setWidth, int setLength,
+                         int setHeight, String setDirection, String sceneDirection, List<Integer> setsPerScene,
                          Location stageStartPos) {
         this.firstSetPos = firstSetPos;
         this.setDistance = setDistance;
         this.sceneSpacing = sceneSpacing;
         this.setWidth = setWidth;
+        this.setLength = setLength;
+        this.setHeight = setHeight;
         this.setDirection = setDirection;
         this.sceneDirection = sceneDirection;
         this.setsPerScene = setsPerScene;
@@ -58,7 +62,8 @@ public class DEHSetHandler {
 
     public Scene getScene(int sceneIdx) {
         Location origin = Scene.move(firstSetPos, (sceneIdx - 1) * sceneSpacing, sceneDirection);
-        return new Scene(origin, setDistance, setWidth, getMaxSet(sceneIdx), setDirection);
+        return new Scene(origin, setDistance, setWidth, setLength, setHeight, getMaxSet(sceneIdx),
+                setDirection, sceneDirection);
     }
 
     public Scene getCurrentScene() {

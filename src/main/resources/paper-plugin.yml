@@ -5,3 +5,8 @@ description: A plugin for the SOC production of Dear Evan Hansen
 author: R1shy
 website: https://papermc.io
 api-version: '1.21.11'
+dependencies:
+  server:
+    WorldEdit:
+      load: BEFORE
+      required: true
