@@ -1,42 +1,39 @@
 package net.rishy.dehplugin;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import java.util.ArrayList;
 import java.util.List;
 
 public class DEHSetHandler {
-    private final List<Location> sceneOrigins;
+    private final Location firstSetPos;
     private final int setDistance;
+    private final int sceneSpacing;
+    private final int setWidth;
+    private final int setLength;
+    private final int setHeight;
+    private final String setDirection;
+    private final String sceneDirection;
     private final List<Integer> setsPerScene;
+    private final Location stageStartPos;
     private final int totalSets;
     private boolean loaded;
     private int sceneNumber = 1;
     private int localSetNumber = 1;
     private int globalSetNumber = 1;
-    public Location STAGE_START_POS = new Location(Bukkit.getWorld("world"), 9, -59, 45);
 
-    public DEHSetHandler(List<Location> sceneOrigins, int setDistance, List<Integer> setsPerScene) {
-        this.sceneOrigins = sceneOrigins;
+    public DEHSetHandler(Location firstSetPos, int setDistance, int sceneSpacing, int setWidth, int setLength,
+                         int setHeight, String setDirection, String sceneDirection, List<Integer> setsPerScene,
+                         Location stageStartPos) {
+        this.firstSetPos = firstSetPos;
         this.setDistance = setDistance;
+        this.sceneSpacing = sceneSpacing;
+        this.setWidth = setWidth;
+        this.setLength = setLength;
+        this.setHeight = setHeight;
+        this.setDirection = setDirection;
+        this.sceneDirection = sceneDirection;
         this.setsPerScene = setsPerScene;
+        this.stageStartPos = stageStartPos;
         this.totalSets = setsPerScene.stream().mapToInt(Integer::intValue).sum();
-    }
-
-    public DEHSetHandler(Location originOfSets, int setDistance) {
-        this(originOfSets, setDistance, setDistance, setDistance, List.of(5, 4, 1, 2));
-    }
-
-    public DEHSetHandler(Location originOfSets, int setDistance, int sceneXStep, int sceneZStep, List<Integer> setsPerScene) {
-        this(buildSceneOrigins(originOfSets, sceneXStep, sceneZStep, setsPerScene.size()), setDistance, setsPerScene);
-    }
-
-    private static List<Location> buildSceneOrigins(Location origin, int sceneXStep, int sceneZStep, int numScenes) {
-        List<Location> origins = new ArrayList<>();
-        for (int i = 0; i < numScenes; i++) {
-            origins.add(origin.clone().add(i * sceneXStep, 0, i * sceneZStep));
-        }
-        return origins;
     }
 
     public int getNumScenes() {
@@ -55,12 +52,18 @@ public class DEHSetHandler {
         return globalSetNumber;
     }
 
+    public Location getStageStartPos() {
+        return stageStartPos;
+    }
+
     public int getMaxSet(int sceneIdx) {
         return setsPerScene.get(sceneIdx - 1);
     }
 
     public Scene getScene(int sceneIdx) {
-        return new Scene(sceneOrigins.get(sceneIdx - 1), setDistance, getMaxSet(sceneIdx));
+        Location origin = Scene.move(firstSetPos, (sceneIdx - 1) * sceneSpacing, sceneDirection);
+        return new Scene(origin, setDistance, setWidth, setLength, setHeight, getMaxSet(sceneIdx),
+                setDirection, sceneDirection);
     }
 
     public Scene getCurrentScene() {

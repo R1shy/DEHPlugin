@@ -10,10 +10,15 @@ repositories {
         name = "papermc"
         url = uri("https://repo.papermc.io/repository/maven-public/")
     }
+    maven {
+        name = "enginehub"
+        url = uri("https://maven.enginehub.org/repo/")
+    }
 }
 
 dependencies {
     compileOnly("com.github.PZDonny.DisplayEntityUtils:api:3.7.0")
+    compileOnly("com.sk89q.worldedit:worldedit-bukkit:7.4.2")
     compileOnly("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
     compileOnly("org.apache.logging.log4j:log4j-core:2.17.1")
     compileOnly("org.apache.logging.log4j:log4j-api:2.17.1")
