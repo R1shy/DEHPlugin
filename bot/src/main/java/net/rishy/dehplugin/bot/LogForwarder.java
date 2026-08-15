@@ -4,7 +4,9 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /** Streams server log lines to the configured log channel, coalesced and rate-limited. */
 public final class LogForwarder implements Runnable {
@@ -12,11 +14,14 @@ public final class LogForwarder implements Runnable {
     private static final long POLL_MS = 500;
     private static final long FLUSH_MS = 2000;
     private static final int MAX_MESSAGE = 1500;
+    private static final String DISCONNECT_SUFFIX = " Disconnected";
+    private static final long DISCONNECT_DEDUP_MS = 3000;
 
     private final JDA jda;
     private final BotConfig config;
     private final ServerController controller;
     private final LogTail tail;
+    private final Map<String, Long> lastDisconnectAt = new HashMap<>();
     private volatile boolean running = true;
 
     public LogForwarder(JDA jda, BotConfig config, ServerController controller) {
@@ -43,7 +48,7 @@ public final class LogForwarder implements Runnable {
                         continue;
                     }
                     String formatted = LogFormatter.format(line);
-                    if (formatted != null) {
+                    if (formatted != null && !isDuplicateDisconnect(formatted)) {
                         pending.add(formatted);
                     }
                 }
@@ -104,5 +109,23 @@ public final class LogForwarder implements Runnable {
     private static boolean isSkippable(String line) {
         return line.contains("Thread RCON Client")
                 && (line.endsWith("started") || line.endsWith("shutting down"));
+    }
+
+    /**
+     * A single disconnect is logged twice by the server ("lost connection: …" and "left the
+     * game"), so suppress a second "Disconnected" for the same player within a short window.
+     */
+    private boolean isDuplicateDisconnect(String formatted) {
+        if (!formatted.endsWith(DISCONNECT_SUFFIX)) {
+            return false;
+        }
+        String name = formatted.substring(0, formatted.length() - DISCONNECT_SUFFIX.length());
+        long now = System.currentTimeMillis();
+        Long last = lastDisconnectAt.get(name);
+        if (last != null && now - last < DISCONNECT_DEDUP_MS) {
+            return true;
+        }
+        lastDisconnectAt.put(name, now);
+        return false;
     }
 }
