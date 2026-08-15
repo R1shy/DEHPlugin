@@ -30,12 +30,10 @@ import java.util.List;
 
 public class DEHListener implements Listener {
 
-    private final DEHSetHandler setHandler = new DEHSetHandler(List.of(
-            new Location(Bukkit.getWorld("world"), 77, -59, 40),
-            new Location(Bukkit.getWorld("world"), 80, -59, 43),
-            new Location(Bukkit.getWorld("world"), 83, -59, 46),
-            new Location(Bukkit.getWorld("world"), 86, -59, 40)), 3, List.of(5, 4, 1, 2));
-    private final Block infoSign = new Location(Bukkit.getWorld("world"), 7,-60,46).getBlock();
+    private final DEHSetHandler setHandler;
+    private final Block infoSign;
+    private final Location reverseNoteBlockPos;
+    private final Location forwardNoteBlockPos;
     private final List<String> crewMembers;
     private final List<String> directors;
     private final String developer;
@@ -47,6 +45,23 @@ public class DEHListener implements Listener {
         this.crewMembers = conf.getStringList("crew");
         this.directors = conf.getStringList("directors");
         this.developer = conf.getString("dev");
+        this.infoSign = readLocation(conf, "controls.info-sign-pos").getBlock();
+        this.reverseNoteBlockPos = readLocation(conf, "controls.reverse-note-block-pos");
+        this.forwardNoteBlockPos = readLocation(conf, "controls.forward-note-block-pos");
+        this.setHandler = new DEHSetHandler(
+                readLocation(conf, "sets.first-set-pos"),
+                conf.getInt("sets.set-distance"),
+                conf.getInt("sets.scene-spacing"),
+                conf.getInt("sets.set-width"),
+                conf.getString("sets.set-direction"),
+                conf.getString("sets.scene-direction"),
+                conf.getIntegerList("sets.sets-per-scene"),
+                readLocation(conf, "sets.stage-start-pos"));
+    }
+
+    private static Location readLocation(FileConfiguration conf, String path) {
+        List<Integer> coords = conf.getIntegerList(path);
+        return new Location(Bukkit.getWorld("world"), coords.get(0), coords.get(1), coords.get(2));
     }
 
     @EventHandler
@@ -64,8 +79,6 @@ public class DEHListener implements Listener {
         }
         Block hitBlock = event.getClickedBlock();
         Player player = event.getPlayer();
-        Location reverseNoteBlockPos = new Location(Bukkit.getWorld("world"),7,-60,45);
-        Location forwardNoteBlock = new Location(Bukkit.getWorld("world"), 7, -60, 47);
         if (hitBlock == null)
             return;
         if (hitBlock.getType() == Material.NOTE_BLOCK) {
@@ -73,7 +86,7 @@ public class DEHListener implements Listener {
                 setHandler.reverse();
                 loadCurrentSet(player);
             }
-            else if (hitBlock.getLocation().equals(forwardNoteBlock)) {
+            else if (hitBlock.getLocation().equals(forwardNoteBlockPos)) {
                 setHandler.advance();
                 loadCurrentSet(player);
             }
@@ -86,7 +99,7 @@ public class DEHListener implements Listener {
     }
 
     private void loadCurrentSet(Player player) {
-        CMDUtils.cloneCMD(setHandler.getCurrentSetStartPos(), setHandler.getCurrentSetEndPos(), setHandler.STAGE_START_POS);
+        CMDUtils.cloneCMD(setHandler.getCurrentSetStartPos(), setHandler.getCurrentSetEndPos(), setHandler.getStageStartPos());
         if (infoSign.getState() instanceof Sign s) {
             SignSide front = s.getSide(Side.FRONT);
             front.setGlowingText(true);

@@ -1,3 +1,18 @@
 dev: "Me"
 crew: ["Jeff", "Jeff1"]
 directors: ["Bob", "Bob1"]
+
+controls:
+  info-sign-pos: [7, -60, 46]
+  reverse-note-block-pos: [7, -60, 45]
+  forward-note-block-pos: [7, -60, 47]
+
+sets:
+  stage-start-pos: [9, -59, 45]
+  first-set-pos: [77, -59, 40]
+  set-distance: 1
+  scene-spacing: 1
+  set-width: 41
+  sets-per-scene: [3, 3, 3]
+  set-direction: "-x"
+  scene-direction: "-z"
